@@ -121,6 +121,8 @@ valoria.world.add('world','3dmodels/rooftop.glb', {castShadow: false, receiveSha
         valoria.world.add('plane', '3dmodels/plane.glb').then(() => {
             valoria.world.models.plane.position.y = -100000000;
 
+            valoria.world.join();
+            
             valoria.update("fall", () => {
                 if (valoria.avatar.model.position.y < -100) {
                     valoria.avatar.model.position.set(2,100,-9)
