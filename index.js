@@ -3,6 +3,9 @@ const loadingBar = document.getElementById('loadingBar');
 loadingBar.style.width = '1%';
 
 const loadingInterval = setInterval(() => {
+    if (parseFloat(loadingBar.style.width) > 85) {
+        return
+    }
     loadingBar.style.width = parseFloat(loadingBar.style.width) + 15 + '%';
 }, 200)
 
