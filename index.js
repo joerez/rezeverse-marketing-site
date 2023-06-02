@@ -1,4 +1,20 @@
+const loading = document.getElementById('loading');
+const loadingBar = document.getElementById('loadingBar');
+loadingBar.style.width = '1%';
+
+const loadingInterval = setInterval(() => {
+    loadingBar.style.width = parseFloat(loadingBar.style.width) + 15 + '%';
+}, 200)
+
+let touchEl;
+let jumpBtn = document.querySelector('.jumpBtn');
+
 valoria.load();
+
+createText('Welcome to Rezeverse!', valoria.scene, 'welcome', false, valoria.THREE)
+createText('Rezeverse creates virtual worlds and 3D Experiences\nfor online communities!\nWe make worlds for virtual conferences, virtual events, and more.\nHire us by emailing odd@hey.com', valoria.scene, 'bar', false, valoria.THREE)
+createText('By the way, this is a multiplayer world! \n Dont believe us? Join in another tab, or on your phone! \n Heck, even phone a friend or two to join!', valoria.scene, 'bar2', false, valoria.THREE)
+
 
 const directionalLight = new valoria.THREE.DirectionalLight(0xffffff, 1)
 directionalLight.position.y = 10
@@ -111,20 +127,24 @@ valoria.world.add('world','3dmodels/rooftop.glb', {castShadow: false, receiveSha
         -3.7306809839592114,0,-4.067159206763494
     )
 
+    loadingBar.style.width = '100%';
+
 
     valoria.avatar.load().then(() => {
         valoria.avatar.model.receiveShadow = true;
         valoria.avatar.model.castShadow = true;            
-
-
-            // Add the plane to the scene
+        // Add the plane to the scene
         valoria.world.add('plane', '3dmodels/plane.glb').then(() => {
             valoria.world.models.plane.position.y = -100000000;
 
-            valoria.world.join();
-            
+            valoria.world.join();          
+
+            loading.style.display = 'none';
+            clearInterval(loadingInterval);        
+    
             valoria.update("fall", () => {
-                if (valoria.avatar.model.position.y < -100) {
+                // console.log(valoria.avatar.model.position)
+                if (valoria.avatar.model.position.y < -50) {
                     valoria.avatar.model.position.set(2,100,-9)
                     // valoria.addText(valoria.avatar.name || "Player");
                     createText(fallMap[fallCount], valoria.scene, 'we-create', false, valoria.THREE)
@@ -141,8 +161,19 @@ valoria.world.add('world','3dmodels/rooftop.glb', {castShadow: false, receiveSha
 
 
 
+
+    valoria.world.onPlayerLeft = (player) => {
+        const name = (player.metadata.name || "Player#" + player.id.substr(0,5))
+        if(name == "World") name = "Waldo";
+        addMsg("World", `${name} has left Valoria.`)
+    }
+    
+
+
+
     
 })
+
 
 
 
@@ -195,7 +226,7 @@ function createText(name, target, type, firstLbSetUp, THREE) {
     target.attach(sprite_)
 
     if (type === 'welcome') {
-        sprite_.position.set(-2, -2, 45)
+        sprite_.position.set(0, .5, 0)
     }
 
     if (type === 'we-create') {
@@ -203,15 +234,15 @@ function createText(name, target, type, firstLbSetUp, THREE) {
 
         setTimeout(() => {
             sprite_.position.set(2000,1,1);
-        },5000)
+        },7000)
     }
 
-    if (type === 'create-list') {
-        sprite_.position.set(-1, -1.9, 8.5)
+    if (type === 'bar') {
+        sprite_.position.set(-10, .5, -8)
     }
 
-    if (type === '1M') {
-        sprite_.position.set(2.2, 6, -2.5)
+    if (type === 'bar2') {
+        sprite_.position.set(-10, .5, -15)
     }
 
     return sprite_;    

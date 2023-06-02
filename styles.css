@@ -1,0 +1,57 @@
+* {
+    font-family: sans-serif;
+}
+
+body {
+    height: 100vh;
+    width: 100vw;
+    overflow: hidden
+}
+
+.loading-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    width: 100vw;
+    background: rgb(19, 1, 26);
+    color: white;
+}
+
+.loading-bar-container {
+    width: 80vw;
+    overflow: hidden;
+}
+
+.loading-bar {
+    height: 50px;
+    width: 1%;
+    background: green;
+    transition: all 1s ease;
+}
+
+
+.jumpBtn{
+    display: none;
+    position: absolute;
+    bottom: 272;
+    right: 8px;
+    cursor: pointer;
+    padding: 4px;
+    color: white;
+    border-radius: 6px;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 0 4px 3px #fe05e1;
+    background: #470059;
+    pointer-events: all;
+    font-weight: bold;
+    text-shadow: 0 0 0.05em #fff, 0 0 0.2em #fe05e1, 0 0 0.3em #fe05e1;
+    font-family: goodTimes;
+  }
+  
+  .jumpBtn{
+    height: 28px;
+  }
+  
