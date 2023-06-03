@@ -144,6 +144,10 @@ valoria.world.add('world','3dmodels/rooftop.glb', {castShadow: false, receiveSha
 
             loading.style.display = 'none';
             clearInterval(loadingInterval);        
+
+            if (valoria.isMobile) {
+                valoria.avatar.enableTouchControls()
+            }
     
             valoria.update("fall", () => {
                 // console.log(valoria.avatar.model.position)
