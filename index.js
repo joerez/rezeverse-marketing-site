@@ -1,3 +1,11 @@
+let isLocal = false;
+let apiUrl =  "https://valoria-llc.onrender.com";
+let wsUrl = "ws://" + new URL(apiUrl).host + "/"
+if(apiUrl.startsWith('https')){
+  wsUrl = "wss://" + new URL(apiUrl).host + "/"
+}
+let ws;
+
 const loading = document.getElementById('loading');
 const loadingBar = document.getElementById('loadingBar');
 loadingBar.style.width = '1%';
@@ -44,7 +52,7 @@ valoria.avatar.nameObject = valoria.addText(valoria.avatar.name || "Player");
 // })
 // const skyBox = new THREE.Mesh(skySphere, skyMat)
 // skyBox.rotation.y = 0;
-// // valoria.scene.add(skyBox)
+// valoria.scene.add(skyBox)
 
 let fallCount = 0;
 
@@ -141,6 +149,16 @@ valoria.world.add('world','3dmodels/rooftop.glb', {castShadow: false, receiveSha
             valoria.world.models.plane.position.y = -100000000;
 
             valoria.world.join();          
+            chatBox.style.display = 'flex';
+
+            addMsg("World", `${valoria.avatar.name} has joined Valoria!`);
+            ws.send(JSON.stringify({
+              event: "Join chat",
+              data: {
+                name: valoria.avatar.name
+              }
+            }))
+      
 
             loading.style.display = 'none';
             clearInterval(loadingInterval);        
@@ -188,7 +206,6 @@ valoria.world.add('world','3dmodels/rooftop.glb', {castShadow: false, receiveSha
 
 
 
-// import * as THREE from 'three'
 
 function createText(name, target, type, firstLbSetUp, THREE) {
     if (!firstLbSetUp) {
@@ -218,9 +235,6 @@ function createText(name, target, type, firstLbSetUp, THREE) {
         context2d_.fillText(lines[i], x, y + (i*lineheight) );
     }
     
-
-    // context2d_.fillText(name, 128 * dpi, 64 * dpi)
-
     const map = new THREE.CanvasTexture(context2d_.canvas)
 
     let sprite_ = new THREE.Sprite(
@@ -255,3 +269,105 @@ function createText(name, target, type, firstLbSetUp, THREE) {
     return sprite_;    
 
 }
+
+
+const chatInputEl = document.querySelector('.chatInput');
+const chatSendBtn = document.querySelector('.chatSendBtn');
+const chatMsgsEl = document.querySelector('.chatMsgs');
+const chatBox = document.querySelector('.chatBox');
+
+ws = new WebSocket(wsUrl)
+ws.onopen = async () => {
+  console.log("Connected to " + wsUrl);
+  ws.onmessage = async (resp) => {
+    resp = JSON.parse(resp.data);
+    if(wsEvents[resp.event]) wsEvents[resp.event](resp.data);
+  }
+  ws.send(JSON.stringify({event: "Load npcs", data: {}}));
+}
+
+const wsEvents = {
+  "New chat message": newChatMsg
+}
+
+document.addEventListener('keyup', (e) => {
+    if (e.code === 'KeyT') {
+        chatInputEl.focus();
+    }
+})
+
+valoria.world.onNewPlayer = (player) => {
+    let name = (player.metadata.name || "Player#" + player.id.substr(0,5))
+    if(name == "World") name = "Waldo";
+    if(player.metadata.justJoined){
+      addMsg("World", `${name} has joined Valoria!`)
+    }
+    valoria.peers[player.metadata.id].subscribed["Valoria Chat Message"] = async (data) => {
+      addMsg(name, data.msg)
+    }
+  }
+
+  async function newChatMsg(data){
+    if(!data.msg || !data.msg.name || !data.msg.msg) return;
+    addMsg(data.msg.name, data.msg.msg)
+  }
+
+
+  valoria.world.onPlayerLeft = (player) => {
+    const name = (player.metadata.name || "Player#" + player.id.substr(0,5))
+    if(name == "World") name = "Waldo";
+    addMsg("World", `${name} has left Valoria.`)
+  }
+
+  chatInputEl.addEventListener("keydown", (e) => {
+    if(e.code == "Enter"){
+      sendMessage()
+    }
+  })
+  
+  chatSendBtn.addEventListener("click", (e) => {
+    sendMessage();
+  })
+
+  async function sendMessage(){
+    const msg = chatInputEl.value;
+    if(msg.length < 1) return;
+    chatInputEl.blur();
+    chatInputEl.value = ""
+    const players = Object.keys(valoria.world.players);
+    players.forEach((player) => {
+      valoria.peers[player].dc.send(JSON.stringify({
+        event: "Valoria Chat Message",
+        data: {
+          msg
+        }
+      }))
+    })
+  
+    addMsg(valoria.avatar.name, msg);
+  
+    ws.send(JSON.stringify({
+      event: "New msg",
+      data: {
+        name: valoria.avatar.name,
+        msg
+      }
+    }))
+  
+  }
+  
+
+  function addMsg(name, msg){
+    let newMsg = document.createElement('div');
+    newMsg.className = "chatMsg";
+    let newMsgSender = document.createElement('span');
+    newMsgSender.className = "chatMsgSender";
+    newMsgSender.textContent = name + ":";
+    newMsg.appendChild(newMsgSender)
+    let newMsgText = document.createElement('span');
+    newMsgText.className = "chatMsgText";
+    newMsgText.textContent = msg;
+    newMsg.appendChild(newMsgText)
+    chatMsgsEl.appendChild(newMsg);
+    chatMsgsEl.scrollTop = chatMsgsEl.scrollHeight;
+  }  
