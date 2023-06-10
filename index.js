@@ -25,6 +25,7 @@ valoria.load();
 createText('Welcome to Rezeverse!\nWe are a creative software agency.', valoria.scene, 'welcome', false, valoria.THREE)
 createText("Rezeverse creates virtual worlds and 3D Experiences for online communities!\nWe make worlds for virtual conferences, virtual events, AMA's and more.\nHire us by emailing odd@hey.com\nsubject line: WORLDS AWAIT", valoria.scene, 'bar', false, valoria.THREE)
 createText('By the way, this is a multiplayer world! \n Dont believe us? Join in another tab, or on your phone! \n Heck, even phone a friend or two to join!\nWe can host thousands of concurrent guests.', valoria.scene, 'bar2', false, valoria.THREE)
+createText(`Looking for the old rezeverse game? Go to game.rezeverse.com`, valoria.scene, 'game', false, valoria.THREE)
 
 
 const directionalLight = new valoria.THREE.DirectionalLight(0xffffff, 1)
@@ -361,6 +362,10 @@ function createText(name, target, type, firstLbSetUp, THREE) {
 
     if (type === 'bar2') {
         sprite_.position.set(-10, .5, -15)
+    }
+
+    if (type === 'game') {
+        sprite_.position.set(-10, .5, -22)
     }
 
     return sprite_;    
