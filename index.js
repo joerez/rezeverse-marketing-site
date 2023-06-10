@@ -221,13 +221,9 @@ valoria.world.add('world','3dmodels/rooftop.glb', {castShadow: false, receiveSha
     valoria.avatar.load().then(() => {
         valoria.avatar.model.receiveShadow = true;
         valoria.avatar.model.castShadow = true;         
-        
-        // deep copy animations
-        const animations = deepCopy(valoria.avatar.model.animations)
-        const animationActions = deepCopy(valoria.avatar.model.animationActions);
-        const activeAnimation = {...valoria.avatar.model.activeAnimation};
         valoria.avatar.set(avatarOption).then(() => {
-
+          loading.style.display = 'none';
+          clearInterval(loadingInterval);        
         })
 
         // Add the plane to the scene
@@ -245,10 +241,6 @@ valoria.world.add('world','3dmodels/rooftop.glb', {castShadow: false, receiveSha
               }
             }))
       
-
-            loading.style.display = 'none';
-            clearInterval(loadingInterval);        
-
             if (valoria.isMobile) {
                 valoria.avatar.enableTouchControls()
             }
