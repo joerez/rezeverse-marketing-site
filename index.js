@@ -135,6 +135,14 @@ const fallMap = [
 
 ]
 
+function getDistance(mesh1, mesh2) { 
+  var dx = mesh1.position.x - mesh2.position.x; 
+  var dy = mesh1.position.y - mesh2.position.y; 
+  var dz = mesh1.position.z - mesh2.position.z; 
+  return Math.sqrt(dx*dx+dy*dy+dz*dz);
+}
+
+
 function deepCopy(obj, hash = new Map()) {
     // If the object is null, undefined, or not an object, return it as is
     if (obj === null || typeof obj !== 'object') {
@@ -161,7 +169,44 @@ function deepCopy(obj, hash = new Map()) {
   
     return copy;
   }
-    
+
+const avatarOptions = ['3dmodels/default-man.glb', '3dmodels/default-woman.glb', 'https://www.valoria.net/valoria/steven.glb', 'https://www.valoria.net/valoria/sophia.glb'];
+const avatarOption = avatarOptions[Math.floor(Math.random() * avatarOptions.length)];
+
+
+var isChangeCharacterListenerAdded = false;
+
+function addChangeCharacterListenerIfNotExists() {
+  if (!isChangeCharacterListenerAdded) {
+    // Add the event listener
+    document.body.addEventListener('keydown', handleChangeCharacter);
+    isEventListenerAdded = true;
+  }
+}
+
+function removeChangeCharacterListenerIfExists() {
+  if (isChangeCharacterListenerAdded) {
+    // Remove the event listener
+    document.body.removeEventListener('keydown', handleChangeCharacter);
+    isEventListenerAdded = false;
+  }
+}
+
+let currentCharacter = avatarOption
+let randomCharacter = avatarOption
+function handleChangeCharacter(event) {
+  if (event.code === 'KeyC') {
+    while (randomCharacter === currentCharacter) {
+      randomCharacter = avatarOptions[Math.floor(Math.random() * avatarOptions.length)]
+      console.log('while',randomCharacter)
+    }
+
+    console.log(randomCharacter)
+    currentCharacter = randomCharacter;
+    valoria.avatar.set(randomCharacter)
+  }
+}
+
 
 valoria.world.add('world','3dmodels/rooftop.glb', {castShadow: false, receiveShadow: true}).then(() => {
     valoria.world.model.position.set(
@@ -180,9 +225,7 @@ valoria.world.add('world','3dmodels/rooftop.glb', {castShadow: false, receiveSha
         const animationActions = deepCopy(valoria.avatar.model.animationActions);
         const activeAnimation = {...valoria.avatar.model.activeAnimation};
         console.log(animations, animationActions, activeAnimation)
-        const avatarOptions = ['3dmodels/default-man.glb', '3dmodels/default-woman.glb'];
-        const avatarOption = avatarOptions[Math.floor(Math.random() * avatarOptions.length)];
-        valoria.avatar.set(avatarOption, {animations: valoria.avatar.model.animations}).then(() => {
+        valoria.avatar.set(avatarOption).then(() => {
 
         })
 
@@ -209,7 +252,7 @@ valoria.world.add('world','3dmodels/rooftop.glb', {castShadow: false, receiveSha
                 valoria.avatar.enableTouchControls()
             }
     
-            valoria.update("fall", () => {
+            valoria.update("positionCheck", () => {
 
                 // console.log(valoria.avatar.model.position)
                 if (valoria.avatar.model.position.y < -50) {
@@ -222,6 +265,15 @@ valoria.world.add('world','3dmodels/rooftop.glb', {castShadow: false, receiveSha
                         fallCount = 0;
                     }
                 }
+
+                if (getDistance(valoria.avatar.model, {position: {
+                  x: -6.284166919485922, y: 0.6799999754875898, z: -2.517633447003323
+                }}) <= 3) {
+                  addChangeCharacterListenerIfNotExists();
+                } else {
+                  removeChangeCharacterListenerIfExists();
+                }
+
             })
         })
 

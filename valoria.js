@@ -6768,7 +6768,7 @@ class Avatar {
         }
         setTimeout(() => {
           this.model.punching = false;
-        }, 300)
+        }, 1000)
       }
     })
 
