@@ -239,7 +239,7 @@ valoria.world.add('world','3dmodels/rooftop.glb', {castShadow: false, receiveSha
             valoria.world.join();          
             chatBox.style.display = 'flex';
 
-            addMsg("World", `${valoria.avatar.name} has joined Valoria!`);
+            addMsg("World", `${valoria.avatar.name} has joined Rezeverse!`);
             ws.send(JSON.stringify({
               event: "Join chat",
               data: {
@@ -299,7 +299,7 @@ valoria.world.add('world','3dmodels/rooftop.glb', {castShadow: false, receiveSha
     valoria.world.onPlayerLeft = (player) => {
         const name = (player.metadata.name || "Player#" + player.id.substr(0,5))
         if(name == "World") name = "Waldo";
-        addMsg("World", `${name} has left Valoria.`)
+        addMsg("World", `${name} has left Rezeverse.`)
     }
     
 
@@ -456,7 +456,7 @@ valoria.world.onNewPlayer = (player) => {
     let name = (player.metadata.name || "Player#" + player.id.substr(0,5))
     if(name == "World") name = "Waldo";
     if(player.metadata.justJoined){
-      addMsg("World", `${name} has joined Valoria!`)
+      addMsg("World", `${name} has joined Rezeverse!`)
     }
     valoria.peers[player.metadata.id].subscribed["Valoria Chat Message"] = async (data) => {
       addMsg(name, data.msg)
@@ -472,7 +472,7 @@ valoria.world.onNewPlayer = (player) => {
   valoria.world.onPlayerLeft = (player) => {
     const name = (player.metadata.name || "Player#" + player.id.substr(0,5))
     if(name == "World") name = "Waldo";
-    addMsg("World", `${name} has left Valoria.`)
+    addMsg("World", `${name} has left Rezeverse.`)
   }
 
   chatInputEl.addEventListener("keydown", (e) => {
