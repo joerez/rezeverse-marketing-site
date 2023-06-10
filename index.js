@@ -234,7 +234,7 @@ valoria.world.add('world','3dmodels/rooftop.glb', {castShadow: false, receiveSha
 
         // Add the plane to the scene
         valoria.world.add('plane', '3dmodels/plane.glb').then(() => {
-            valoria.world.models.plane.position.y = -100000000;
+            valoria.world.models.plane.position.y = -1400;
 
             valoria.world.join();          
             chatBox.style.display = 'flex';
@@ -258,6 +258,10 @@ valoria.world.add('world','3dmodels/rooftop.glb', {castShadow: false, receiveSha
                     valoria.avatar.model.position.set(2,100,-9)
                     // valoria.addText(valoria.avatar.name || "Player");
                     createText(fallMap[fallCount], valoria.scene, 'we-create', false, valoria.THREE)
+                    // setTimeout(() => {
+                    //   addMsg("Demiurge", fallMap[fallCount - 1]);
+                    // }, 1500)
+
                     fallCount++
 
                     if (!fallMap[fallCount]) {
@@ -351,7 +355,7 @@ function createText(name, target, type, firstLbSetUp, THREE) {
 
         setTimeout(() => {
             sprite_.position.set(2000,1,1);
-        },7000)
+        },10000)
     }
 
     if (type === 'bar') {
