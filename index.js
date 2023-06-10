@@ -221,10 +221,16 @@ valoria.world.add('world','3dmodels/rooftop.glb', {castShadow: false, receiveSha
     valoria.avatar.load().then(() => {
         valoria.avatar.model.receiveShadow = true;
         valoria.avatar.model.castShadow = true;         
-        valoria.avatar.set(avatarOption).then(() => {
+
+        if (valoria.isMobile) {
           loading.style.display = 'none';
           clearInterval(loadingInterval);        
-        })
+        } else {
+          valoria.avatar.set(avatarOption).then(() => {
+            loading.style.display = 'none';
+            clearInterval(loadingInterval);        
+          })  
+        }
 
         // Add the plane to the scene
         valoria.world.add('plane', '3dmodels/plane.glb').then(() => {
