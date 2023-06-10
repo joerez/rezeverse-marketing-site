@@ -175,9 +175,11 @@ const avatarOption = avatarOptions[Math.floor(Math.random() * avatarOptions.leng
 
 
 var isChangeCharacterListenerAdded = false;
+const changingRoom = document.querySelector('#changingRoom');
 
 function addChangeCharacterListenerIfNotExists() {
   if (!isChangeCharacterListenerAdded) {
+    changingRoom.style.display = 'flex';  
     // Add the event listener
     document.body.addEventListener('keydown', handleChangeCharacter);
     isEventListenerAdded = true;
@@ -186,6 +188,7 @@ function addChangeCharacterListenerIfNotExists() {
 
 function removeChangeCharacterListenerIfExists() {
   if (isChangeCharacterListenerAdded) {
+    changingRoom.style.display = 'none';
     // Remove the event listener
     document.body.removeEventListener('keydown', handleChangeCharacter);
     isEventListenerAdded = false;
@@ -198,10 +201,8 @@ function handleChangeCharacter(event) {
   if (event.code === 'KeyC') {
     while (randomCharacter === currentCharacter) {
       randomCharacter = avatarOptions[Math.floor(Math.random() * avatarOptions.length)]
-      console.log('while',randomCharacter)
     }
 
-    console.log(randomCharacter)
     currentCharacter = randomCharacter;
     valoria.avatar.set(randomCharacter)
   }
@@ -224,7 +225,6 @@ valoria.world.add('world','3dmodels/rooftop.glb', {castShadow: false, receiveSha
         const animations = deepCopy(valoria.avatar.model.animations)
         const animationActions = deepCopy(valoria.avatar.model.animationActions);
         const activeAnimation = {...valoria.avatar.model.activeAnimation};
-        console.log(animations, animationActions, activeAnimation)
         valoria.avatar.set(avatarOption).then(() => {
 
         })
@@ -268,10 +268,12 @@ valoria.world.add('world','3dmodels/rooftop.glb', {castShadow: false, receiveSha
 
                 if (getDistance(valoria.avatar.model, {position: {
                   x: -6.284166919485922, y: 0.6799999754875898, z: -2.517633447003323
-                }}) <= 3) {
+                }}) <= 1.5) {
                   addChangeCharacterListenerIfNotExists();
+                  isChangeCharacterListenerAdded = true;
                 } else {
                   removeChangeCharacterListenerIfExists();
+                  isChangeCharacterListenerAdded = false;
                 }
 
             })
