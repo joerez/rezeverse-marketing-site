@@ -41,7 +41,9 @@ valoria.scene.add(pLight2)
 
 valoria.avatar.name = 'Guest#' + Math.floor((Math.random() * 8999) + 1000);
 valoria.avatar.nameObject = valoria.addText(valoria.avatar.name || "Player");
-
+// valoria.avatar.url = '3dmodels/joe.glb';
+// valoria.avatar.url = 'https://models.readyplayer.me/647d8ae9786b05cdb7cb407a.glb'
+valoria.avatar.receiveShadow = true;
 
 // const skySphere = new valoria.THREE.SphereGeometry(500, 500, 500)
 // const skyTexture = new valoria.THREE.TextureLoader().load('/universe.jpeg')
@@ -133,6 +135,34 @@ const fallMap = [
 
 ]
 
+function deepCopy(obj, hash = new Map()) {
+    // If the object is null, undefined, or not an object, return it as is
+    if (obj === null || typeof obj !== 'object') {
+      return obj;
+    }
+  
+    // If the object is already memoized, return the memoized copy
+    if (hash.has(obj)) {
+      return hash.get(obj);
+    }
+  
+    // Create an empty copy of the object
+    const copy = Array.isArray(obj) ? [] : {};
+  
+    // Memoize the copy before deep copying its properties
+    hash.set(obj, copy);
+  
+    // Iterate over the object's properties and deep copy them
+    for (let key in obj) {
+      if (Object.prototype.hasOwnProperty.call(obj, key)) {
+        copy[key] = deepCopy(obj[key], hash);
+      }
+    }
+  
+    return copy;
+  }
+    
+
 valoria.world.add('world','3dmodels/rooftop.glb', {castShadow: false, receiveShadow: true}).then(() => {
     valoria.world.model.position.set(
         -3.7306809839592114,0,-4.067159206763494
@@ -143,7 +173,19 @@ valoria.world.add('world','3dmodels/rooftop.glb', {castShadow: false, receiveSha
 
     valoria.avatar.load().then(() => {
         valoria.avatar.model.receiveShadow = true;
-        valoria.avatar.model.castShadow = true;            
+        valoria.avatar.model.castShadow = true;         
+        
+        // deep copy animations
+        const animations = deepCopy(valoria.avatar.model.animations)
+        const animationActions = deepCopy(valoria.avatar.model.animationActions);
+        const activeAnimation = {...valoria.avatar.model.activeAnimation};
+        console.log(animations, animationActions, activeAnimation)
+        const avatarOptions = ['3dmodels/default-man.glb', '3dmodels/default-woman.glb'];
+        const avatarOption = avatarOptions[Math.floor(Math.random() * avatarOptions.length)];
+        valoria.avatar.set(avatarOption, {animations: valoria.avatar.model.animations}).then(() => {
+
+        })
+
         // Add the plane to the scene
         valoria.world.add('plane', '3dmodels/plane.glb').then(() => {
             valoria.world.models.plane.position.y = -100000000;
@@ -168,6 +210,7 @@ valoria.world.add('world','3dmodels/rooftop.glb', {castShadow: false, receiveSha
             }
     
             valoria.update("fall", () => {
+
                 // console.log(valoria.avatar.model.position)
                 if (valoria.avatar.model.position.y < -50) {
                     valoria.avatar.model.position.set(2,100,-9)
@@ -371,3 +414,28 @@ valoria.world.onNewPlayer = (player) => {
     chatMsgsEl.appendChild(newMsg);
     chatMsgsEl.scrollTop = chatMsgsEl.scrollHeight;
   }  
+
+
+
+
+  // idle
+  // run
+  // jump
+  // dance
+  // punch
+  // death
+
+
+  // once on mixamo, export model as fbx, not animations
+
+  // then download each animation seperately as fbx. Save animations as their name.fbx
+
+  // open blender, import the base model, then put in the animations while in the animation action editor.
+
+  // then you can see all your actions. click them and stash them.
+
+  // once all stashed they can be deleted from the scene.
+
+  // scene should only have the base model, but the base model will have animations on a track.
+
+  // export that whole thing as a glb.
