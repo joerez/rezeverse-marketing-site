@@ -66,8 +66,8 @@ const fallMap = [
 'You really dont like it here do you?',
 'Well I dont know what to tell you.\n Nothing special will happen if you keep doing this.',
 'There really isnt any special easter egg after the 10th time, trust me.',
-'Okay youre starting to anger me.\n If you do it again im turning off the lights',
-'Okay fine. I lied about the lights.',
+'Okay youre starting to anger me.\n If you do it again im turning off the lights.',
+'Lights out.',
 'I dislike you.',
 "Gravity called. It wants me to tell you it's not your friend.",
 "Congratulations on completing the 'Fall and Return' tutorial.\n Now try something else!",
@@ -257,12 +257,21 @@ valoria.world.add('world','3dmodels/rooftop.glb', {castShadow: false, receiveSha
                 if (valoria.avatar.model.position.y < -50) {
                     valoria.avatar.model.position.set(2,100,-9)
                     // valoria.addText(valoria.avatar.name || "Player");
-                    createText(fallMap[fallCount], valoria.scene, 'we-create', false, valoria.THREE)
+                    // createText(fallMap[fallCount], valoria.scene, 'we-create', false, valoria.THREE)
+
+                    // if (godText.style.display === 'flex') {
+                    //   godText.style.display = 'none';
+                    //   godText.innerHTML = '';
+                    // }
+
+                    setTimeout(() => {
+                      addGodText(fallMap[fallCount])
+                      fallCount++
+                    }, 1400)
                     // setTimeout(() => {
                     //   addMsg("Demiurge", fallMap[fallCount - 1]);
                     // }, 1500)
 
-                    fallCount++
 
                     if (!fallMap[fallCount]) {
                         fallCount = 0;
@@ -300,9 +309,52 @@ valoria.world.add('world','3dmodels/rooftop.glb', {castShadow: false, receiveSha
 })
 
 
+var timeoutId;
+
+const godText = document.querySelector('#godText');
+function addGodText(msg) {
+  if (fallCount === 7) {
+    removeLights()
+  }
+  if (fallCount === 8) {
+    addLights()
+  }
+  godText.innerHTML = `<h1>${msg}</h1>`
+  godText.style.display = 'flex';
 
 
+  // Clear the previous timeout if it exists
+  if (timeoutId) {
+    clearTimeout(timeoutId);
+  }
 
+  // Set a new timeout
+  timeoutId = setTimeout(() => {
+    godText.style.display = 'none';
+    godText.innerHTML = '';
+  }, 5000);
+}
+
+
+var lights = valoria.scene.children.filter(function(child) {
+  return child instanceof THREE.Light;
+});
+
+// Function to remove all the lights
+function removeLights() {
+  // Remove all lights from the scene
+  for (var i = 0; i < lights.length; i++) {
+    valoria.scene.remove(lights[i]);
+  }
+}
+
+// Function to add back the lights
+function addLights() {
+  // Add back all the lights to the scene
+  for (var i = 0; i < lights.length; i++) {
+    valoria.scene.add(lights[i]);
+  }
+}
 
 
 

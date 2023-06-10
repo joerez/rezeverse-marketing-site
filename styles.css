@@ -187,3 +187,22 @@ body {
     text-shadow: 0 0 0.05em #fff, 0 0 0.2em #fe05e1, 0 0 0.3em #fe05e1;
     text-align: center;
   }
+
+  #godText {
+    position: absolute;
+    top: 10vh;
+    left: 0;
+    right: 0;
+    margin: auto;
+    height: 100px;
+    width: auto;
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 10000000000000;
+    color: white;
+    text-align: center;
+    text-shadow: 2px 2px 4px #000000;
+    white-space: pre-line
+  }
