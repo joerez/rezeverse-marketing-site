@@ -47,7 +47,7 @@ valoria.avatar.nameObject = valoria.addText(valoria.avatar.name || "Player");
 valoria.avatar.receiveShadow = true;
 
 // const skySphere = new valoria.THREE.SphereGeometry(500, 500, 500)
-// const skyTexture = new valoria.THREE.TextureLoader().load('/universe.jpeg')
+// const skyTexture = new valoria.THREE.TextureLoader().load('/bkg.jpeg')
 // const skyMat = new THREE.MeshBasicMaterial({
 //     color: 0xffffff,
 //     side: THREE.BackSide,
@@ -55,6 +55,7 @@ valoria.avatar.receiveShadow = true;
 // })
 // const skyBox = new THREE.Mesh(skySphere, skyMat)
 // skyBox.rotation.y = 0;
+// skyBox.position.y = -50;
 // valoria.scene.add(skyBox)
 
 let fallCount = 0;
@@ -253,25 +254,13 @@ valoria.world.add('world','3dmodels/rooftop.glb', {castShadow: false, receiveSha
     
             valoria.update("positionCheck", () => {
 
-                // console.log(valoria.avatar.model.position)
                 if (valoria.avatar.model.position.y < -50) {
                     valoria.avatar.model.position.set(2,100,-9)
-                    // valoria.addText(valoria.avatar.name || "Player");
-                    // createText(fallMap[fallCount], valoria.scene, 'we-create', false, valoria.THREE)
-
-                    // if (godText.style.display === 'flex') {
-                    //   godText.style.display = 'none';
-                    //   godText.innerHTML = '';
-                    // }
 
                     setTimeout(() => {
                       addGodText(fallMap[fallCount])
                       fallCount++
                     }, 1400)
-                    // setTimeout(() => {
-                    //   addMsg("Demiurge", fallMap[fallCount - 1]);
-                    // }, 1500)
-
 
                     if (!fallMap[fallCount]) {
                         fallCount = 0;

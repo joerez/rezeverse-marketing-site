@@ -7037,7 +7037,7 @@ class Avatar {
         for(let i=0;i<intersect.length;i++){
           if (intersect[i].distance < 0.5 ){
             const obj = intersect[i].object;
-            if(obj.geometry?.boundingBox?.max?.y >= 1) {
+            if(obj.geometry?.boundingBox?.max?.y >= 1.2) {
               this.model.position.copy(this.lastPos);
             }
           }
@@ -7113,9 +7113,9 @@ class Avatar {
   }
 
   jump = () => {
-    if (!this.model.jumping && this.onGround) {
+    if (this.onGround) {
       this.model.jumping = true;
-      this.velocity.y = 10.0;
+      this.velocity.y = 11.0;
       setTimeout(() => {
         this.model.jumping = false;
       }, 600)
@@ -7199,19 +7199,19 @@ class Avatar {
   }
 
   async equipSword(url){
-    const self = this;
-    if(!url) url = self.swordUrl;
-    self.swordUrl = url;
-    self.attack = 50;
-    self.model.sword = await self.valoria.loadModel(self.swordUrl);
-    self.model.getObjectByName("mixamorigRightHand").attach(self.model.sword);
-    self.model.sword.position.set(0, 26, 0);
-    self.model.sword.rotation.set(0, -3, 2.5);
-    if(self.url.endsWith("sophia.glb")){
-      self.model.sword.position.set(0, 2000, 0);
-    } else if(self.url.endsWith("neptune.glb")){
-      self.model.sword.position.set(0, 0.2, 0);
-    }
+    // const self = this;
+    // if(!url) url = self.swordUrl;
+    // self.swordUrl = url;
+    // self.attack = 50;
+    // self.model.sword = await self.valoria.loadModel(self.swordUrl);
+    // self.model.getObjectByName("mixamorigRightHand").attach(self.model.sword);
+    // self.model.sword.position.set(0, 26, 0);
+    // self.model.sword.rotation.set(0, -3, 2.5);
+    // if(self.url.endsWith("sophia.glb")){
+    //   self.model.sword.position.set(0, 2000, 0);
+    // } else if(self.url.endsWith("neptune.glb")){
+    //   self.model.sword.position.set(0, 0.2, 0);
+    // }
   }
 
   unequipSword(){
