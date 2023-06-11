@@ -26,19 +26,77 @@ createText('Welcome to Rezeverse!\nWe are a creative software agency.', valoria.
 createText("Rezeverse creates virtual worlds and 3D Experiences for online communities!\nWe make worlds for virtual conferences, virtual events, AMA's and more.\nHire us by emailing odd@hey.com\nsubject line: WORLDS AWAIT", valoria.scene, 'bar', false, valoria.THREE)
 createText('By the way, this is a multiplayer world! \n Dont believe us? Join in another tab, or on your phone! \n Heck, even phone a friend or two to join!\nWe can host thousands of concurrent guests.', valoria.scene, 'bar2', false, valoria.THREE)
 createText(`Looking for the old rezeverse game? Go to game.rezeverse.com`, valoria.scene, 'game', false, valoria.THREE)
+createText(`There are countless worlds around us.\n Type /world island, /world plaza, or /world rooftop to explore them.`, valoria.scene, 'worlds', false, valoria.THREE)
+
+const worlds = ['rooftop','island','plaza']
 
 
-const directionalLight = new valoria.THREE.DirectionalLight(0xffffff, 1)
-directionalLight.position.y = 10
-directionalLight.castShadow = true
-valoria.scene.add(directionalLight)
+const roofTopLights = (notFirst = false) => {
 
-const pLight2 = new valoria.THREE.PointLight(0x777777, 1)
-pLight2.position.y = 10
-pLight2.position.x = 0
-pLight2.position.z = 0
-pLight2.castShadow = true
-valoria.scene.add(pLight2)
+  if (notFirst) {
+    let light = new valoria.THREE.AmbientLight()
+    light.intensity = 1
+    light.position.y = 50
+    valoria.scene.add(light)
+  }
+
+  const directionalLight = new valoria.THREE.DirectionalLight(0xffffff, 1)
+  directionalLight.position.y = 10
+  directionalLight.castShadow = true
+  valoria.scene.add(directionalLight)
+  
+  const pLight2 = new valoria.THREE.PointLight(0x777777, 1)
+  pLight2.position.y = 10
+  pLight2.position.x = 0
+  pLight2.position.z = 0
+  pLight2.castShadow = true
+  valoria.scene.add(pLight2)  
+}
+
+const islandLights = () => {
+  let light = new valoria.THREE.AmbientLight()
+  light.intensity = 1
+  light.position.y = 50
+  valoria.scene.add(light)
+
+  const directionalLight = new valoria.THREE.DirectionalLight(0xffffff, .5)
+  directionalLight.position.y = 50
+  directionalLight.position.x = 0
+
+  directionalLight.castShadow = true
+  valoria.scene.add(directionalLight)
+  
+  const pLight2 = new valoria.THREE.PointLight(0x777777, .5, 100)
+  pLight2.position.y = 10
+  pLight2.position.x = 0
+  pLight2.position.z = 0
+  pLight2.castShadow = true
+  valoria.scene.add(pLight2)  
+}
+
+const plazaLights = () => {
+  let light = new valoria.THREE.AmbientLight()
+  light.intensity = 1
+  light.position.y = 50
+  valoria.scene.add(light)
+
+  const directionalLight = new valoria.THREE.DirectionalLight(0xffffff, 1)
+  directionalLight.position.y = 30
+  directionalLight.castShadow = true
+  valoria.scene.add(directionalLight)
+  
+  const pLight2 = new valoria.THREE.PointLight(0x777777, 1, 100)
+  pLight2.position.y = 30
+  pLight2.position.x = 30
+  pLight2.position.z = 0
+  pLight2.castShadow = true
+  valoria.scene.add(pLight2)  
+}
+
+
+
+roofTopLights(false);
+
 
 valoria.avatar.name = 'Guest#' + Math.floor((Math.random() * 8999) + 1000);
 valoria.avatar.nameObject = valoria.addText(valoria.avatar.name || "Player");
@@ -211,7 +269,7 @@ function handleChangeCharacter(event) {
 }
 
 
-valoria.world.add('world','3dmodels/rooftop.glb', {castShadow: false, receiveShadow: true}).then(() => {
+valoria.world.add('world',`3dmodels/${worlds[0]}.glb`, {castShadow: false, receiveShadow: true}).then(() => {
     valoria.world.model.position.set(
         -3.7306809839592114,0,-4.067159206763494
     )
@@ -330,7 +388,14 @@ var lights = valoria.scene.children.filter(function(child) {
 });
 
 // Function to remove all the lights
-function removeLights() {
+function removeLights(newWorld = false) {
+
+  if (newWorld) {
+    lights = valoria.scene.children.filter(function(child) {
+      return child instanceof THREE.Light;
+    });
+  }
+
   // Remove all lights from the scene
   for (var i = 0; i < lights.length; i++) {
     valoria.scene.remove(lights[i]);
@@ -411,6 +476,10 @@ function createText(name, target, type, firstLbSetUp, THREE) {
         sprite_.position.set(-10, .5, -22)
     }
 
+    if (type === 'worlds') {
+        sprite_.position.set(-3, .5, -24)
+    }
+
     return sprite_;    
 
 }
@@ -438,6 +507,11 @@ const wsEvents = {
 document.addEventListener('keyup', (e) => {
     if (e.code === 'KeyT') {
         chatInputEl.focus();
+    }
+
+    if (e.code === 'Slash') {
+        chatInputEl.focus();
+        chatInputEl.value = '/';
     }
 })
 
@@ -488,6 +562,51 @@ valoria.world.onNewPlayer = (player) => {
         }
       }))
     })
+
+    if (msg.includes('/world')) {
+      valoria.world.remove('world');
+      let newWorld = msg.split('/world ')[1];
+      valoria.world.add('world',`3dmodels/${newWorld}.glb`, {receiveShadow: true}).then(() => {
+        valoria.avatar.model.position.y = 10;
+
+        removeLights(true)
+        // valoria.scene.traverse(function (object) {
+        //   if (object instanceof THREE.Light) {
+        //     scene.remove(object);
+        //   }
+        // });
+        
+        if (newWorld === 'island') {
+          valoria.world.model.position.set(
+            -3.7306809839592114,-2,-4.067159206763494
+          )
+
+    
+          islandLights()
+          // addLights()
+
+        }
+
+        if (newWorld === 'rooftop') {
+          valoria.world.model.position.set(
+            -3.7306809839592114,0,-4.067159206763494
+          )
+          roofTopLights(true);
+          // addLights()
+
+        }
+
+        if (newWorld === 'plaza') {
+          valoria.world.model.position.set(
+            -3.7306809839592114,0,-4.067159206763494
+          )
+          plazaLights()
+          // addLights()
+
+        }
+
+      })
+    }
   
     addMsg(valoria.avatar.name, msg);
   
