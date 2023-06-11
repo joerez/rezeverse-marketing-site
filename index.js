@@ -566,7 +566,10 @@ valoria.world.onNewPlayer = (player) => {
     if (msg.includes('/world')) {
       valoria.world.remove('world');
       let newWorld = msg.split('/world ')[1];
+      addGodText(`Joining ${newWorld}...`)
       valoria.world.add('world',`3dmodels/${newWorld}.glb`, {receiveShadow: true}).then(() => {
+        valoria.avatar.model.position.x = 0;
+        valoria.avatar.model.position.z = 00;
         valoria.avatar.model.position.y = 10;
 
         removeLights(true)
@@ -604,6 +607,9 @@ valoria.world.onNewPlayer = (player) => {
           // addLights()
 
         }
+
+        godText.style.display = 'none';
+        godText.innerHTML = '';    
 
       })
     }
