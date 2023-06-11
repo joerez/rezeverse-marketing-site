@@ -26,7 +26,7 @@ createText('Welcome to Rezeverse!\nWe are a creative software agency.', valoria.
 createText("Rezeverse creates virtual worlds and 3D Experiences for online communities!\nWe make worlds for virtual conferences, virtual events, AMA's and more.\nHire us by emailing odd@hey.com\nsubject line: WORLDS AWAIT", valoria.scene, 'bar', false, valoria.THREE)
 createText('By the way, this is a multiplayer world! \n Dont believe us? Join in another tab, or on your phone! \n Heck, even phone a friend or two to join!\nWe can host thousands of concurrent guests.', valoria.scene, 'bar2', false, valoria.THREE)
 createText(`Looking for the old rezeverse game? Go to game.rezeverse.com`, valoria.scene, 'game', false, valoria.THREE)
-createText(`There are countless worlds around us.\n Type /world island, /world plaza, or /world rooftop to explore them.`, valoria.scene, 'worlds', false, valoria.THREE)
+createText(`Experimental: There are countless worlds around us.\n Type /world island, /world plaza, or /world rooftop to explore them.`, valoria.scene, 'worlds', false, valoria.THREE)
 
 const worlds = ['rooftop','island','plaza']
 
