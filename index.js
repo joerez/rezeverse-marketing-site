@@ -289,6 +289,12 @@ valoria.world.add('world',`3dmodels/${worlds[0]}.glb`, {castShadow: false, recei
             loading.style.display = 'none';
             clearInterval(loadingInterval);        
           })  
+
+          valoria.avatar.create().then((url) => {
+            console.log(url);
+
+            valoria.avatar.set(url);
+          })
         }
 
         // Add the plane to the scene

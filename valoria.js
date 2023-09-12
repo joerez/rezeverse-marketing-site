@@ -6692,39 +6692,37 @@ var MeshoptDecoder = (function() {
 class Avatar {
   constructor(valoria) { 
     this.valoria = valoria;
-    // this.defaultUrl = valoria.mainUrl;
-    let rand = Math.random();
-    this.defaultUrl = valoria.mainUrl + (rand > 0.5 ? "valoria/steven.glb" : "valoria/sophia.glb") ;
+    this.defaultUrl = valoria.mainUrl + (Math.random() > 0.5 ? "valoria/steven.glb" : "valoria/sophia.glb");
     this.url = this.defaultUrl;
     this.camera = valoria.camera;
     this.domElement = valoria.el;
-    this.cursor = {}
+    this.cursor = {};
     this.loaded = false;
-    this.position = {x: 0, y: 0, z: 0},
-    this.rotation= {x: 0, y: 0, z: 0},
+    this.position = { x: 0, y: 0, z: 0 };
+    this.rotation = { x: 0, y: 0, z: 0 };
     this.originalSpeed = 6;
     this.speed = this.originalSpeed;
     this.sprintSpeed = 10;
     this.frame = 0;
     this.metadata = {};
-    this.target = new THREE.Vector3()
-    this.spherical = new THREE.Spherical()
-    this.sphericalDelta = new THREE.Spherical()
-    this.rotateSpeed = 1.0
+    this.target = new THREE.Vector3();
+    this.spherical = new THREE.Spherical();
+    this.sphericalDelta = new THREE.Spherical();
+    this.rotateSpeed = 1.0;
     this.health = 100;
     this.attack = 20;
-    this.rotateStart = null
-    this.rotateEnd = new THREE.Vector2()
-    this.rotateDelta = new THREE.Vector2()
-    this.ranOnce = false
-    this.activeAction
+    this.rotateStart = null;
+    this.rotateEnd = new THREE.Vector2();
+    this.rotateDelta = new THREE.Vector2();
+    this.ranOnce = false;
+    this.activeAction;
     this.lastAction;
     this.swordUrl = "valoria/blade.glb";
     this.domElement.onclick = () => {
-      if(!this.valoria.isMobile){
-        this.domElement.requestPointerLock()
+      if (!this.valoria.isMobile) {
+        this.domElement.requestPointerLock();
       }
-    }
+    };
 
     this.onKilledPlayer = (player) => {
       console.log("KILLED PLAYER");
@@ -6768,7 +6766,7 @@ class Avatar {
         }
         setTimeout(() => {
           this.model.punching = false;
-        }, 1000)
+        }, 300)
       }
     })
 
@@ -6859,6 +6857,14 @@ class Avatar {
       if(self.loaded) return res(self.model);
       try {
         self.model = await self.valoria.loadModel(self.url);
+        if(self.model.children[0].name == "Armature"){
+          const armature = self.model.children[0];
+          let avatar = new THREE.Object3D();
+          self.model.attach(avatar);
+          avatar.attach(armature);
+          self.model.avatar = avatar;
+        }
+        let model = self.model.avatar ? self.model.avatar : self.model;
         if(self.model.box) self.model.box.clear();
         const geometry = new THREE.BoxGeometry( 1, 1, 1 );
         const material = new THREE.MeshBasicMaterial( {color: 0x00ff00} );
@@ -6900,8 +6906,8 @@ class Avatar {
         // };
           
         self.nameObject = await self.valoria.addText(self.name || "Player");
-        self.model.add(self.nameObject);
-        self.nameObject.position.y = 1.8;
+        model.attach(self.nameObject);
+        self.nameObject.position.y = 2;
 
         self.loaded = true;
 
@@ -6919,7 +6925,7 @@ class Avatar {
         self.valoria.scene.add(self.model);
 
         self.onload();
-        res(self.model);
+        res(model);
       } catch(e){
         rej(e);
       }
@@ -6930,6 +6936,7 @@ class Avatar {
     const self = this;
     if(!this.loaded) return;
     this.isMoving = this.model.move.forward !== 0 || this.model.move.left !== 0;
+    let model = this.model.avatar ? this.model.avatar : this.model;
     if(this.model && this.model.mixer){
       this.model.mixer.update(delta);
       if (this.model.dying){
@@ -6965,18 +6972,19 @@ class Avatar {
       var newView = new THREE.Vector3()
       newView.copy(viewPos)
       let pos = this.camera.dirTarget.getWorldPosition(newView)
+
       if (
         (this.model.move.forward !== 0 || this.model.move.left !== 0) &&
         (JSON.stringify(this.model.lastMove) !== JSON.stringify(this.model.move) ||
         JSON.stringify(this.camera.lastPosition) !== JSON.stringify(this.camera.position))
       ) {
         this.valoria.scene.attach(this.camera.parent)
-        this.model.lookAt(
-            this.model.position.x - (pos.x - this.model.position.x),
-            this.model.position.y + 1,
-            this.model.position.z - (pos.z - this.model.position.z)
+        model.lookAt(
+            model.position.x - (pos.x - model.position.x),
+            model.position.y + 1,
+            model.position.z - (pos.z - model.position.z)
         )
-        this.model.attach(this.camera.parent)
+        model.attach(this.camera.parent)
       }
 
       if(!this.valoria.isMobile){
@@ -7007,7 +7015,7 @@ class Avatar {
 		// this.model.position.addScaledVector( this.tempVector, this.speed * delta );
     // console.log((this.isMoving ? 1 : 0) * this.speed * (this.valoria.isMobile ? 0.006 : delta))
     if(!this.model.dying){
-      this.model.translateZ((this.isMoving ? 1 : 0) * this.speed * (this.valoria.isMobile ? 0.006 : delta));
+      model.translateZ((this.isMoving ? 1 : 0) * this.speed * (this.valoria.isMobile ? 0.006 : delta));
     }
     
     this.model.lastMove = Object.assign({}, this.model.move)
@@ -7017,34 +7025,34 @@ class Avatar {
     if(!this.valoria.isMobile && !this.valoria.vr.session){
       this.sphericalDelta.set(0, 0, 0)
       this.camera.lookAt(
-        this.model.position.x,
-        this.model.position.y + 1,
-        this.model.position.z
+        model.position.x,
+        model.position.y + 1,
+        model.position.z
       )
       this.camera.lastPos = Object.assign({}, this.camera.position)
     }
 
-    if(this.model && this.valoria?.world?.model && (this.isMoving || !this.onGround)){
+    if(model && this.valoria?.world?.model && (this.isMoving || !this.onGround)){
 
-      let rPos = new THREE.Vector3().copy(this.model.position)
+      let rPos = new THREE.Vector3().copy(model.position);
       rPos.y = 1.5;
-      let dir = this.model.getWorldDirection(new THREE.Vector3())
-      this.valoria.raycaster.set(rPos, dir)
-
-      // let intersect = this.valoria.raycaster.intersectObject(this.valoria.world.model);
+      let dir = model.getWorldDirection(new THREE.Vector3());
+      this.valoria.raycaster.set(rPos, dir);
+  
       let intersect = this.valoria.raycaster.intersectObject(this.valoria.world.model);
-      if(intersect?.length){
-        for(let i=0;i<intersect.length;i++){
-          if (intersect[i].distance < 0.5 ){
-            const obj = intersect[i].object;
-            if(obj.geometry?.boundingBox?.max?.y >= 1.2) {
-              this.model.position.copy(this.lastPos);
-            }
-          }
-        }
+      if(intersect.length && intersect[0].distance < 0.5) {
+        // Calculate the overlap distance
+        let overlap = 0.5 - intersect[0].distance;
+  
+        // Push the player back along the inverse direction
+        let pushBack = dir.clone().multiplyScalar(-1).multiplyScalar(overlap);
+  
+        // Interpolate for smooth sliding
+        let newPosition = new THREE.Vector3().lerpVectors(model.position, model.position.clone().add(pushBack), 0.5);
+        model.position.copy(newPosition);
       }
   
-      rPos.set(this.model.position.x, this.model.position.y + 1.2, this.model.position.z);
+      rPos.set(model.position.x, model.position.y + 1.2, model.position.z);
       this.valoria.raycaster.set(rPos, new THREE.Vector3(0, -1, 0));
       intersect = this.valoria.raycaster.intersectObject(this.valoria.world.model);
 
@@ -7061,15 +7069,15 @@ class Avatar {
         }
       }
      
-      this.lastPos = new THREE.Vector3().copy(this.model.position);
+      this.lastPos = new THREE.Vector3().copy(model.position);
     }
 
     this.gravity = -30;
     this.velocity.y += this.onGround ? 0 : delta * this.gravity;
-	  this.model.position.addScaledVector( this.velocity, delta );
+	  model.position.addScaledVector( this.velocity, delta );
 
-    if(!this.model.jumping && this.model.position.y <= this.groundY || Math.abs(this.model.position.y - this.groundY) < 0.01){
-      this.model.position.y = this.groundY;
+    if(!this.model.jumping && model.position.y <= this.groundY || Math.abs(model.position.y - this.groundY) < 0.01){
+      model.position.y = this.groundY;
       this.onGround = true;
       this.velocity.set(0,0,0)
     } else {
@@ -7113,9 +7121,9 @@ class Avatar {
   }
 
   jump = () => {
-    if (this.onGround) {
+    if (!this.model.jumping && this.onGround) {
       this.model.jumping = true;
-      this.velocity.y = 11.0;
+      this.velocity.y = 10.0;
       setTimeout(() => {
         this.model.jumping = false;
       }, 600)
@@ -7199,19 +7207,19 @@ class Avatar {
   }
 
   async equipSword(url){
-    // const self = this;
-    // if(!url) url = self.swordUrl;
-    // self.swordUrl = url;
-    // self.attack = 50;
-    // self.model.sword = await self.valoria.loadModel(self.swordUrl);
-    // self.model.getObjectByName("mixamorigRightHand").attach(self.model.sword);
-    // self.model.sword.position.set(0, 26, 0);
-    // self.model.sword.rotation.set(0, -3, 2.5);
-    // if(self.url.endsWith("sophia.glb")){
-    //   self.model.sword.position.set(0, 2000, 0);
-    // } else if(self.url.endsWith("neptune.glb")){
-    //   self.model.sword.position.set(0, 0.2, 0);
-    // }
+    const self = this;
+    if(!url) url = self.swordUrl;
+    self.swordUrl = url;
+    self.attack = 50;
+    self.model.sword = await self.valoria.loadModel(self.swordUrl);
+    self.model.getObjectByName("mixamorigRightHand").attach(self.model.sword);
+    self.model.sword.position.set(0, 26, 0);
+    self.model.sword.rotation.set(0, -3, 2.5);
+    if(self.url.endsWith("sophia.glb")){
+      self.model.sword.position.set(0, 2000, 0);
+    } else if(self.url.endsWith("neptune.glb")){
+      self.model.sword.position.set(0, 0.2, 0);
+    }
   }
 
   unequipSword(){
@@ -7219,6 +7227,79 @@ class Avatar {
     self.attack = 20;
     self.model.sword.clear();
     delete self.model.sword;
+  }
+
+  async create(){
+    const self = this;
+    return new Promise(async (res, rej) => {
+
+      const frame = document.createElement('iframe');
+      frame.id = "frame";
+      frame.setAttribute("allow", "camera *; microphone *; clipboard-write");
+      frame.setAttribute("src", "https://valoria.readyplayer.me/avatar?frameApi")
+      frame.style.position = "absolute";
+      frame.style.zIndex = "1000000000000";
+      frame.style.width = "100%";
+      frame.style.height = "100%";
+      frame.style.maxHeight = "100%";
+      frame.style.maxWidth = "100%";
+      frame.style.margin = "0px";
+      frame.style.fontFamily = "-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif";
+      frame.style.fontSize = "14px";
+      frame.style.border = "none";
+      frame.style.top = "0px";
+      frame.style.left = "0px";
+      document.body.appendChild(frame);
+
+      window.removeEventListener('message', subscribe)
+      document.removeEventListener('message', subscribe)
+      window.addEventListener('message', subscribe);
+      document.addEventListener('message', subscribe);
+      function subscribe(event) {
+        let json;
+        try {
+          json = JSON.parse(event.data);
+        } catch(e){
+          // console.log("could not parse readyplayer.me message json")
+        }
+        if (json?.source !== 'readyplayerme') {
+            // rej("request was intercepted");
+        }
+  
+        // Susbribe to all events sent from Ready Player Me once frame is ready
+        if (json.eventName === 'v1.frame.ready') {
+            frame.contentWindow.postMessage(
+                JSON.stringify({
+                    target: 'readyplayerme',
+                    type: 'subscribe',
+                    eventName: 'v1.**'
+                }),
+                '*'
+            );
+        }
+  
+        // Get avatar GLB URL
+        if (json.eventName === 'v1.avatar.exported') {
+            console.log(`Avatar URL: ${json.data.url}`);
+            frame.remove()
+            self.valoria.avatars.push({
+              name: "",
+              url: json.data.url,
+              position: {x: 0, y: -1.65, z: -0.67},
+              scale: 0.7
+            })
+            
+            res(json.data.url)
+        }
+  
+        // Get user id
+        if (json.eventName === 'v1.user.set') {
+            console.log(`User with id ${json.data.id} set: ${JSON.stringify(json)}`);
+        }
+      }
+  
+
+    })
   }
 
 }
@@ -18988,6 +19069,8 @@ class Valoria {
     this.onWalletConnect = (addr) => {}
     this.onWalletDisconnect = (addr) => {}
 
+    this.animations = {};
+
     this.avatars = [
       {
         name: "Sophia",
@@ -18998,7 +19081,7 @@ class Valoria {
         name: "Steven",
         url: `${this.mainUrl}valoria/steven.glb`,
         position: {x: 0, y: -1.5, z: -0.7}
-      },
+      }
     ]
 
   }
@@ -19140,9 +19223,14 @@ class Valoria {
         //   }
         // }
 
-        return res();
+        // return res();
   
       }
+
+      await this.loadAnimations();
+
+      return res()
+
     })
   }
 
@@ -19163,7 +19251,20 @@ class Valoria {
     }
   }
 
+  async loadAnimations(){
+    const ACTION_NAMES = ["Idle", "Dance", "Death", "Jump", "Punch", "Run", "TPose"]
+    return new Promise(async (res, rej) => {
+      this.loader.load(`${this.mainUrl}valoria/animations.glb`, (gltf) => {
+        for(let i=0;i<gltf.animations.length;i++){
+          this.animations[ACTION_NAMES[i]] = gltf.animations[i]
+        }
+        res();
+      })
+    })
+  }
+
   async loadModel(url, opts={castShadow: !valoria.isMobile, scene: null}){
+    const ACTION_NAMES = ["Idle", "Dance", "Death", "Jump", "Punch", "Run", "TPose"]
     if(!opts.scene) opts.scene = this.scene; 
     return new Promise(async (res, rej) => {
       this.loader.load(url, (gltf) => {
@@ -19186,6 +19287,11 @@ class Valoria {
         }
         gltf.scene.setAction = (toActionName, timeScale=1) => {
           let toAction = gltf.scene.animationActions[toActionName];
+          if(!toAction && this.animations[toActionName]){
+            gltf.scene.animationActions[toActionName] = gltf.scene.mixer.clipAction(this.animations[toActionName]);
+          } else if(!toAction){
+            return;
+          }
           if (toAction && toAction != gltf.scene.activeAction) {
             gltf.scene.lastAction = gltf.scene.activeAction
             gltf.scene.activeAction = toAction
